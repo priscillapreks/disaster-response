@@ -4,7 +4,6 @@ from sqlalchemy import create_engine
 import pandas as pd
 import numpy as np
 import re 
-import pickle
 
 import nltk
 from nltk import word_tokenize
@@ -21,6 +20,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import classification_report
+import pickle
 
 
 def load_data(database_filepath):
@@ -76,22 +76,24 @@ def build_model():
     # create grid search object
     model = GridSearchCV(pipeline, parameters)
 
-    return model
+    return pipeline
 
 
-def evaluate_model(model, X_test, y_test, category_names):
+def evaluate_model(model, X_test, y_test):
     '''Predict and Output results on the test set'''
 
     y_pred = model.predict(X_test)
-    report = classification_report(y_test.values[:,], y_pred, target_names=category_names)
+    report = classification_report(y_test.values[:,], y_pred, target_names=y_test.columns)
     return print(report)
 
 
 def save_model(model, model_filepath):
-    '''Exports the final model as a pickle file'''
+    '''Exports the final model as a file
+    joblib.dump(model, model_filepath) '''
     
-    with open(model_filepath, 'wb') as file:
-        pickle.dump(model, file)
+    pkl_filename = "classifier.pkl"
+    with open(pkl_filename, 'wb') as file:
+        pickle.dump(model, file)  
 
 
 def main():
